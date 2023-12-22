@@ -12,12 +12,19 @@ from sklearn.manifold import TSNE
 
 plt.style.use('ggplot')
 
-def save(savename, saving_function):
+def save(savename, saving_function, final_version=False):
     parent_abs = os.path.abspath(os.path.join(os.getcwd(),os.pardir))
     parent = 'reports'
     path = os.path.join(parent_abs, parent, savename)
     
-    saving_function(path)
+    if final_version:
+        try:
+            saving_function(path, dpi=300)
+        except:
+            print("Could not print in high-resolution")
+            saving_function(path)
+    else:
+        saving_function(path)
     
     print('figure saved on ', path)
 # 
@@ -26,7 +33,7 @@ def save(savename, saving_function):
 # Feature visualization
 
 
-def pca_2d(X, hue=[], title="PCA 2 dimension reduction", savename=False):
+def pca_2d(X, hue=[], final_version=False, title="PCA 2 dimension reduction", savename=False):
     '''
     receives X features
     return a scatter plot of 2 components pca
@@ -49,12 +56,13 @@ def pca_2d(X, hue=[], title="PCA 2 dimension reduction", savename=False):
     plt.title(title)
 
     if savename :
-        save(savename, fig.savefig)
+        save(savename, fig.savefig,
+             final_version=final_version)
 
     plt.show()
 
 
-def pca_3d(X, hue=[],  title="PCA 3 dimension reduction", multiple_graph=False, savename=False):
+def pca_3d(X, hue=[], title="PCA 3 dimension reduction", final_version=False, multiple_graph=False, savename=False):
     '''
     plot a 3 components pca
     if multiple_graph: more 3 2d combinations        
@@ -63,7 +71,11 @@ def pca_3d(X, hue=[],  title="PCA 3 dimension reduction", multiple_graph=False, 
     pca = decomposition.PCA(n_components=4)
     view = pca.fit_transform(X)
 
-    fig = plt.figure(figsize=(12,10))
+    if final_version:
+        fig = plt.figure(figsize=(14,12), dpi=600)
+    else:
+        fig = plt.figure(figsize=(12,10))
+    
     ax = fig.add_subplot(221, projection='3d')
     fig.patch.set_facecolor('white')
     alpha = 0.4
@@ -95,12 +107,12 @@ def pca_3d(X, hue=[],  title="PCA 3 dimension reduction", multiple_graph=False, 
     plt.title(title, loc='center')
 
     if savename :
-        save(savename, fig.savefig)
-
+        save(savename, fig.savefig,
+             final_version=final_version)
     plt.show()
 
 
-def t_sne(X, hue=[], title="t-SNE dimensionality reduction", savename=False):
+def t_sne(X, final_version=False, hue=[], title="t-SNE dimensionality reduction", savename=False):
     '''
     plot two component t_SNE
     '''
@@ -118,7 +130,9 @@ def t_sne(X, hue=[], title="t-SNE dimensionality reduction", savename=False):
     plt.title(title)
 
     if savename :
-        save(savename, fig.savefig)
+        save(savename,  
+             fig.savefig,
+             final_version=final_version)
     plt.show()
 
 
@@ -131,11 +145,12 @@ def template(savename=False, title=""):
         save(savename, fig.savefig)
     plt.show()
 
-def corr_map(correlation_matrix, title="Correlation matrix", savename=False):
+def corr_map(correlation_matrix, final_version=False, title="Correlation matrix", savename=False):
     fig = plt.figure(figsize=(12,10))
     sns.heatmap(correlation_matrix, annot=False, cmap='coolwarm', fmt=".2f")
     plt.title(title)
     
     if savename:
-        save(savename,fig.savefig)
+        save(savename, fig.savefig,
+             final_version=final_version)
     plt.show()
